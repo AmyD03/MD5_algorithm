@@ -20,6 +20,11 @@ four basic bit operation functions:
 #define H(x,y,z) ((x) ^ (y) ^ (z))
 #define I(x,y,z) ((y) ^ ((x) | (~z)))
 
+/*对于32位的操作数，实现循环左移：
+    将操作数 x 向左移动 s 位：x << s
+    将操作数 x 向右移动 32 - s 位：x >> (32 - s)
+*/
+#define ROTATE_LEFT(x,s) (( x << s ) | ( x >> (32-s)))
 
 /*
 four round cycle functions:
@@ -53,6 +58,7 @@ four round cycle functions:
     a = ROTATE_LEFT(a, s); \
     a += b; \
 }
+
 
 void MD5Init(MD5_CTX* context);//初始化
 void MD5Update(unsigned int inputLen, unsigned char* input, MD5_CTX *context); //MD5算法运行

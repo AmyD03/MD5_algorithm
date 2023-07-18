@@ -20,11 +20,12 @@ void MD5Init(MD5_CTX* context){
     context->state[3]=0x10325476;
 }
 
-//需要进行四轮运算 Four Round Cycle Operation
+
 
 
 void MD5Update(unsigned int inputLen, unsigned char* input, MD5_CTX *context){
-
+  
+  //需要进行四轮运算 Four Round Cycle Operation
 }
 void MD5Output(unsigned char [16],MD5_CTX *context){
 
