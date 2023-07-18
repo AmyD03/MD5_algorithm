@@ -5,3 +5,8 @@
      &emsp; b)能够检查文件的完整性：文件一旦被更改，MD5值不同，能够防止文件被篡改 <br />
 3.算法内容： <br />
      &emsp;处理512位字符串中的数据，分解为16个字，每个字由32位组成，MD5输出的是一个128位的消息摘要值。 <br />
+
+
+参考文献
+Javaweb login authentication based on improved MD5 algorithm
+https://ieeexplore.ieee.org/document/7846653
