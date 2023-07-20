@@ -1,15 +1,20 @@
 #ifndef MD5_H
 #define MD5_H
+#include<string.h>
 
 //初始化缓冲区
 typedef struct{
     unsigned int count[2];
     unsigned int state[4];    //A,B,C,D四个常数
+    /*A,B,C,D分别是32位的寄存器，
+        初始化使用的是十六进制表示的数字，
+        A为最低字节*/
     unsigned char buffer[64]; //输入数据缓冲区
 }MD5_CTX;
 
 /*
 four basic bit operation functions:
+    输入三个32位的字，输出一个32位的字
     F(X,Y,Z) = ( X and Y ) or ( not(X) and Z )
     G(X,Y,Z) = ( X and Z ) or ( Y and not(Z) )
     H(X,Y,Z) = X xor Y xor Z
@@ -19,6 +24,7 @@ four basic bit operation functions:
 #define G(x,y,z) (( x & z ) | ( y & ~z))
 #define H(x,y,z) ((x) ^ (y) ^ (z))
 #define I(x,y,z) ((y) ^ ((x) | (~z)))
+
 
 /*对于32位的操作数，实现循环左移：
     将操作数 x 向左移动 s 位：x << s
@@ -32,35 +38,40 @@ four round cycle functions:
     GG(a,b,c,d,Mj,s,Ti):a = b + (( a + G(b,c,d) + Mj + Ti) <<<s)
     HH(a,b,c,d,Mj,s,Ti):a = b + (( a + H(b,c,d) + Mj + Ti) <<<s)
     II(a,b,c,d,Mj,s,Ti):a = b + (( a + I(b,c,d) + Mj + Ti) <<<s)
-    宏定义非末行结尾加反斜杠
+    宏定义非末行结尾加反斜杠:
+        The backslash (\) character is used as the continuation character 
+        to  continue #define statements and strings to the next line. 
 */
-#define FF(a,b,c,d,Mj,s,Ti) \ 
-{ \
-    a += F(b, c, d) + Mj + Ti; \
-    a = ROTATE_LEFT(a, s); \
-    a += b; \
-}
-#define GG(a,b,c,d,Mj,s,Ti) \ 
-{ \
-    a += G(b, c, d) + Mj + Ti; \
-    a = ROTATE_LEFT(a, s); \
-    a += b; \
-}
-#define HH(a,b,c,d,Mj,s,Ti) \ 
-{ \
-    a += H(b, c, d) + Mj + Ti; \
-    a = ROTATE_LEFT(a, s); \
-    a += b; \
-}
-#define II(a,b,c,d,Mj,s,Ti) \ 
-{ \
-    a += I(b, c, d) + Mj + Ti; \
-    a = ROTATE_LEFT(a, s); \
-    a += b; \
-}
+
+#define FF(a,b,c,d,x,s,ac) \
+	{ \
+		a += F(b,c,d) + x + ac; \
+		a = ROTATE_LEFT(a,s); \
+		a += b; \
+	}
+#define GG(a,b,c,d,x,s,ac) \
+	{ \
+		a += G(b,c,d) + x + ac; \
+		a = ROTATE_LEFT(a,s); \
+		a += b; \
+	}
+#define HH(a,b,c,d,x,s,ac) \
+	{ \
+		a += H(b,c,d) + x + ac; \
+		a = ROTATE_LEFT(a,s); \
+		a += b; \
+	}
+#define II(a,b,c,d,x,s,ac) \
+	{ \
+		a += I(b,c,d) + x + ac; \
+		a = ROTATE_LEFT(a,s); \
+		a += b; \
+	}
 
 
 void MD5Init(MD5_CTX* context);//初始化
+void Decode(unsigned int *output,unsigned char *input,unsigned int len);
 void MD5Update(unsigned int inputLen, unsigned char* input, MD5_CTX *context); //MD5算法运行
+void MD5Transform(unsigned int state[4], unsigned char block[64]);
 void MD5Output(unsigned char [16],MD5_CTX *context);//经过MD5算法的输出值
 #endif
