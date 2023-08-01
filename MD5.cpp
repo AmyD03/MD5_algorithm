@@ -9,23 +9,45 @@ unsigned char PADDING[64] = {
 };
 
 void MD5Init(MD5_CTX* context){
-    //
-    context->count[0]=0;
+    //初始化已处理的数据长度为0
+    context->count[0]=0; 
     context->count[1]=0;
-    //初始化A,B,C,D为四个参数
+    //初始化A,B,C,D为四个参数，使得不同的计算中使用相同的初始化状态
     context->state[0]=0x67452301;
     context->state[1]=0xefcdab89;
     context->state[2]=0x98badcfe;
     context->state[3]=0x10325476;
 }
-//解码函数：
-void Decode(unsigned int *output,unsigned char *input,unsigned int len){
 
+//解码函数：将输入的char数组转换为int数组，将每4个字节组成一个32位整数
+void Decode(unsigned char* input,unsigned int* output,unsigned int len){
+	unsigned int i = 0,j = 0;
+	while(j < len) {
+		//每次解码4个字节，将输入的input中的4个字节组合成一个32位的int，并存入int的对应位置
+		//<<8:将2进制数左移8位
+		/*eg.
+			output[i] = (input[j]) | (input[j+1] << 8) | (input[j+2] << 16) | (input[j+3] << 24);
+			output[i] = 0x04000000 | 0x00030000 | 0x00000200 | 0x00000001;
+			output[i] = 0x04030201;
+		*/
+		output[i] = (input[j]) | (input[j+1] << 8) | (input[j+2] << 16) | (input[j+3] << 24);
+		i++;
+		j+=4;
+	}
 }
 
+void Encode(unsigned int* input,unsigned char* output,unsigned int len){
+	unsigned int i=0,j=0;
+	while( j < len ){
+		output[j]=input[i] & 
+		output[j+1]=
+		j+=4;
+	}
+	
+}
 
 void MD5Update(unsigned int inputLen, unsigned char* input, MD5_CTX *context){
-  
+  MD5Transform(context->state,context->buffer);
 }
 
 void MD5Transform(unsigned int state[4], unsigned char block[64]){
@@ -110,5 +132,9 @@ void MD5Transform(unsigned int state[4], unsigned char block[64]){
 	state[3] += d;
 }
 void MD5Output(unsigned char [16],MD5_CTX *context){
+	MD5Update();
+	MD5Update();
+	Encode();
 
 }
+

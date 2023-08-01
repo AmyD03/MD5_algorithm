@@ -4,9 +4,10 @@
 
 //初始化缓冲区
 typedef struct{
-    unsigned int count[2];
+    unsigned int count[2];  //count数组用于记录已处理的数据长度，以位为单位
+                            //count[0]为处理数字的低位，count[1]为处理数字的高位
     unsigned int state[4];    //A,B,C,D四个常数
-    /*A,B,C,D分别是32位的寄存器，
+    /*A,B,C,D代表四个32位的状态寄存器，这些寄存器在处理每个分组时被更新
         初始化使用的是十六进制表示的数字，
         A为最低字节*/
     unsigned char buffer[64]; //输入数据缓冲区
