@@ -1,5 +1,5 @@
-#include"md5.h"
-#include<string.h>
+#include "MD5.h"
+#include <string.h>
 
 //数据填充的内容
 unsigned char PADDING[64] = {
@@ -39,15 +39,14 @@ void Decode(unsigned char* input,unsigned int* output,unsigned int len){
 void Encode(unsigned int* input,unsigned char* output,unsigned int len){
 	unsigned int i=0,j=0;
 	while( j < len ){
-		output[j]=input[i] & 
-		output[j+1]=
+		output[j] = input[i] & 0xFF;
+		//按位与操作，0xFF的二进制表示为 00000000 00000000 00000000 11111111。通过与运算，只保留input[i]中的最低8位，其他位全部置零
+		output[j+1] = (input[i]>>8) & 0xFF;
+		output[j+2] = (input[i]>>16) & 0xFF;
+		output[j+3] = (input[i]>>24) & 0xFF;
+		i++;
 		j+=4;
-	}
-	
-}
-
-void MD5Update(unsigned int inputLen, unsigned char* input, MD5_CTX *context){
-  MD5Transform(context->state,context->buffer);
+	}	
 }
 
 void MD5Transform(unsigned int state[4], unsigned char block[64]){
@@ -56,7 +55,7 @@ void MD5Transform(unsigned int state[4], unsigned char block[64]){
   	unsigned int c = state[2];
   	unsigned int d = state[3];
 	unsigned int x[64];
-	Decode(x,block,64);
+	Decode(block,x,64);
   //需要进行四轮运算 Four Round Cycle Operation
   	FF(a, b, c, d, x[ 0], 7, 0xd76aa478);
 	FF(d, a, b, c, x[ 1], 12, 0xe8c7b756);
@@ -131,10 +130,21 @@ void MD5Transform(unsigned int state[4], unsigned char block[64]){
 	state[2] += c;
 	state[3] += d;
 }
-void MD5Output(unsigned char [16],MD5_CTX *context){
-	MD5Update();
-	MD5Update();
-	Encode();
 
+void MD5Update( MD5_CTX *context, unsigned char* input, unsigned int inputLen){
+	unsigned partlen =0,i=0,index=0;
+  	MD5Transform(context->state,context->buffer);
+	
+
+  	//void *memcpy(void *str1, const void *str2, size_t n) 从存储区 str2 复制 n 个字节到存储区 str1
+  	memcpy(&context->state[index],&input[i],inputLen-1);
 }
 
+
+void MD5Output(unsigned char digest[16],MD5_CTX *context){
+	unsigned index=0,padlen=0;
+	Encode(context->count,bits,8);
+	MD5Update(context,PADDING,padlen);
+	MD5Update(context,bits,8);
+	Encode(context->state,digest,16);
+}
