@@ -134,8 +134,23 @@ void MD5Transform(unsigned int state[4], unsigned char block[64]){
 void MD5Update( MD5_CTX *context, unsigned char* input, unsigned int inputLen){
 	unsigned partlen =0,i=0,index=0;
   	MD5Transform(context->state,context->buffer);
-	
-
+	index= (context->count[0] >> 3) & 0x3f;
+	/*计算当前已处理数据的位数对应的字节索引,将count[0]的低3位舍去，得到字节索引
+	>>3:将位数转换成字节数 & 3xff:低 6 位*/
+	partlen=64-index;
+	context->count[0]+=inputLen<<3;
+	if((context->count[0]) < (inputLen<<3)){
+		context->count[1]++;
+	}
+		context->count[1]+=inputLen>>29;
+	if(inputLen >= partlen){
+		for(i=partlen;i+64<=inputLen;i+=64){
+			MD5Transform(context->state,context->buffer);
+		}
+		index=0;
+	}else{
+		i=0;
+	}
   	//void *memcpy(void *str1, const void *str2, size_t n) 从存储区 str2 复制 n 个字节到存储区 str1
   	memcpy(&context->state[index],&input[i],inputLen-1);
 }
@@ -143,6 +158,8 @@ void MD5Update( MD5_CTX *context, unsigned char* input, unsigned int inputLen){
 
 void MD5Output(unsigned char digest[16],MD5_CTX *context){
 	unsigned index=0,padlen=0;
+	unsigned char bits[8];
+	padlen = (index<56)?(56-index):(120-index);
 	Encode(context->count,bits,8);
 	MD5Update(context,PADDING,padlen);
 	MD5Update(context,bits,8);
